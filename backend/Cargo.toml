@@ -1,0 +1,25 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+argon2 = { version = "0.5.2", features = ["std"] }
+axum = { version = "0.7.2", features = ["macros", "multipart", "query"] }
+axum_typed_multipart = "0.11.0"
+bb8 = "0.8.1"
+chrono = { version = "0.4.31", features = ["serde"] }
+diesel = { version = "2.1.4", features = ["postgres", "chrono"] }
+diesel-async = { version = "0.4.1", features = ["postgres", "bb8"] }
+diesel_full_text_search = "2.1.1"
+dotenvy = "0.15.7"
+jsonwebtoken = "9.2.0"
+rust-s3 = "0.34.0-rc4"
+serde = { version = "1.0.193", features = ["derive"] }
+tempfile = "3.8.1"
+tokio = { version = "1.35.0", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+uuid = { version = "1.6.1", features = ["v4", "fast-rng"] }
