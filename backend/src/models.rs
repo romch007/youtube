@@ -1,3 +1,4 @@
+use crate::schema::*;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -27,6 +28,26 @@ pub struct Video {
 
     pub author_id: i32,
 }
+
+/// We literally never want to select `textsearchable_index_col`
+/// so we provide this type and constant to pass to `.select`
+type VideoAllColumns = (
+    videos::id,
+    videos::title,
+    videos::description,
+    videos::bucket,
+    videos::published_at,
+    videos::author_id,
+);
+
+pub const VIDEO_ALL_COLUMNS: VideoAllColumns = (
+    videos::id,
+    videos::title,
+    videos::description,
+    videos::bucket,
+    videos::published_at,
+    videos::author_id,
+);
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = crate::schema::videos)]

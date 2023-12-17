@@ -12,6 +12,7 @@ use axum_typed_multipart::{FieldData, TryFromMultipart, TypedMultipart};
 
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
+use diesel_full_text_search::*;
 
 use serde::Deserialize;
 use tempfile::NamedTempFile;
@@ -38,25 +39,32 @@ struct ListVideoQuery {
 
 async fn list_videos(
     State(state): State<AppState>,
-    axum::extract::Query(query): axum::extract::Query<ListVideoQuery>,
+    axum::extract::Query(params): axum::extract::Query<ListVideoQuery>,
 ) -> Result<Json<Vec<models::VideoWithAuthor>>, (StatusCode, String)> {
     use schema::users::dsl::users;
-    use schema::videos::dsl::title;
+    use schema::videos::dsl::textsearchable_index_col;
     use schema::videos::dsl::videos;
 
-    let mut conn = state.db_pool.get().await.unwrap();
+    let selection = (models::VIDEO_ALL_COLUMNS, models::User::as_select());
 
-    let mut sql_query = videos.inner_join(users).into_boxed();
+    let mut query = videos.inner_join(users).select(selection).into_boxed();
 
-    if let Some(search_term) = query.search {
+    if let Some(search_term) = params.search {
         if !search_term.is_empty() {
-            let pattern = format!("%{search_term}%");
-            sql_query = sql_query.filter(title.like(pattern));
+            let q = diesel::dsl::sql::<TsQuery>("plainto_tsquery('english', ")
+                .bind::<diesel::sql_types::Text, _>(search_term)
+                .sql(")");
+
+            query = query.filter(q.clone().matches(textsearchable_index_col));
+
+            let rank = ts_rank_cd(textsearchable_index_col, q);
+            query = query.then_order_by(rank.desc())
         }
     }
 
-    let res = sql_query
-        .select((models::Video::as_select(), models::User::as_select()))
+    let mut conn = state.db_pool.get().await.unwrap();
+
+    let res = query
         .load::<(models::Video, models::User)>(&mut conn)
         .await
         .map_err(errors::internal_error)?;
@@ -105,6 +113,7 @@ async fn upload(
 
     let inserted_video = diesel::insert_into(videos)
         .values(&new_video)
+        .returning(models::VIDEO_ALL_COLUMNS)
         .get_result(&mut conn)
         .await
         .map_err(errors::internal_error)?;
