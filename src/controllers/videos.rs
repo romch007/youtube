@@ -1,4 +1,4 @@
-use crate::{auth, errors, models, schema, AppState};
+use crate::{auth, errors, models, schema, video_util, AppState};
 
 use errors::NotFoundExt;
 
@@ -94,6 +94,10 @@ async fn upload(
 
     let bucket_id = uuid::Uuid::new_v4().to_string();
 
+    // FIXME: don't return internal server error if the uploaded file is not a video
+    let video_duration = video_util::get_video_duration(upload_request.video.contents.path())
+        .map_err(errors::internal_error)?;
+
     let mut tmp_video_file = tokio::fs::File::from_std(upload_request.video.contents.into_file());
 
     state
@@ -107,6 +111,7 @@ async fn upload(
     let new_video = models::NewVideo {
         title: upload_request.title,
         description: upload_request.description,
+        duration_seconds: video_duration.num_seconds(),
         bucket: bucket_id,
         author_id: logged_user.id,
     };

@@ -15,6 +15,7 @@ diesel = { version = "2.1.4", features = ["postgres", "chrono"] }
 diesel-async = { version = "0.4.1", features = ["postgres", "bb8"] }
 diesel_full_text_search = "2.1.1"
 dotenvy = "0.15.7"
+ffmpeg-next = "6.1.0"
 jsonwebtoken = "9.2.0"
 rust-s3 = "0.34.0-rc4"
 serde = { version = "1.0.193", features = ["derive"] }

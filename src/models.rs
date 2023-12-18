@@ -21,6 +21,7 @@ pub struct Video {
     pub id: i32,
     pub title: String,
     pub description: String,
+    pub duration_seconds: i64,
     pub bucket: String,
 
     #[serde(skip_deserializing)]
@@ -35,6 +36,7 @@ type VideoAllColumns = (
     videos::id,
     videos::title,
     videos::description,
+    videos::duration_seconds,
     videos::bucket,
     videos::published_at,
     videos::author_id,
@@ -44,6 +46,7 @@ pub const VIDEO_ALL_COLUMNS: VideoAllColumns = (
     videos::id,
     videos::title,
     videos::description,
+    videos::duration_seconds,
     videos::bucket,
     videos::published_at,
     videos::author_id,
@@ -55,6 +58,7 @@ pub struct NewVideo {
     pub title: String,
     pub description: String,
     pub bucket: String,
+    pub duration_seconds: i64,
     pub author_id: i32,
 }
 

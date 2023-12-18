@@ -5,6 +5,9 @@ mod db;
 mod errors;
 mod models;
 mod schema;
+mod video_util;
+
+extern crate ffmpeg_next as ffmpeg;
 
 use std::net::SocketAddr;
 
@@ -22,6 +25,8 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
+    ffmpeg::init().expect("cannot init ffmpeg");
+
     // Setup logging
     tracing_subscriber::registry()
         .with(

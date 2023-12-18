@@ -34,7 +34,7 @@ export async function fetcher<T>(url: string): Promise<T> {
 }
 
 export function resolveVideo(bucket: string): string {
-  return `http://172.19.0.2:9000/videos/${bucket}`;
+  return `http://localhost:9000/videos/${bucket}`;
 }
 
 export default api;

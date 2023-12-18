@@ -19,6 +19,7 @@ diesel::table! {
         id -> Int4,
         title -> Varchar,
         description -> Text,
+        duration_seconds -> Int8,
         bucket -> Varchar,
         published_at -> Timestamptz,
         author_id -> Int4,
