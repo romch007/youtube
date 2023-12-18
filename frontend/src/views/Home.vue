@@ -19,8 +19,8 @@
       >
         <v-card-title>{{ video.title }}</v-card-title>
         <v-card-subtitle
-          >{{ video.author.username }} -
-          {{ formatDate(video.published_at) }}</v-card-subtitle
+          >{{ video.author.username }} - {{ formatDate(video.published_at) }} -
+          {{ formatDuration(video.duration_seconds) }}</v-card-subtitle
         >
 
         <v-card-text class="text-justify">
@@ -54,5 +54,9 @@ function truncate(text: string): string {
   if (text.length < MAX_DESCRIPTION_LENGTH) return text;
 
   return text.slice(0, MAX_DESCRIPTION_LENGTH) + "...";
+}
+
+function formatDuration(seconds: number): string {
+  return dayjs.duration(seconds, "seconds").format("mm[min] ss[s]");
 }
 </script>

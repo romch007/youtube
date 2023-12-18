@@ -18,6 +18,7 @@ export interface Video {
   title: string;
   description: string;
   bucket: string;
+  duration_seconds: number;
   author_id: string;
   author: User;
   published_at: string;

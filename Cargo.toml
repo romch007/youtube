@@ -23,4 +23,4 @@ tempfile = "3.8.1"
 tokio = { version = "1.35.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-uuid = { version = "1.6.1", features = ["v4", "fast-rng"] }
+uuid = { version = "1.6.1", features = ["v4", "fast-rng", "serde"] }
