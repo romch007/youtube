@@ -92,7 +92,7 @@ async fn upload(
 ) -> Result<Json<models::Video>, (StatusCode, String)> {
     use schema::videos::dsl::videos;
 
-    let bucket_id = uuid::Uuid::new_v4().to_string();
+    let bucket_id = uuid::Uuid::new_v4();
 
     // FIXME: don't return internal server error if the uploaded file is not a video
     let video_duration = video_util::get_video_duration(upload_request.video.contents.path())
@@ -102,7 +102,7 @@ async fn upload(
 
     state
         .s3
-        .put_object_stream(&mut tmp_video_file, &bucket_id)
+        .put_object_stream(&mut tmp_video_file, bucket_id.to_string())
         .await
         .map_err(errors::internal_error)?;
 

@@ -20,7 +20,7 @@ diesel::table! {
         title -> Varchar,
         description -> Text,
         duration_seconds -> Int8,
-        bucket -> Varchar,
+        bucket -> Uuid,
         published_at -> Timestamptz,
         author_id -> Int4,
         textsearchable_index_col -> Tsvector,

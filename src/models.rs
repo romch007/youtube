@@ -22,7 +22,7 @@ pub struct Video {
     pub title: String,
     pub description: String,
     pub duration_seconds: i64,
-    pub bucket: String,
+    pub bucket: uuid::Uuid,
 
     #[serde(skip_deserializing)]
     pub published_at: chrono::DateTime<chrono::Utc>,
@@ -57,7 +57,7 @@ pub const VIDEO_ALL_COLUMNS: VideoAllColumns = (
 pub struct NewVideo {
     pub title: String,
     pub description: String,
-    pub bucket: String,
+    pub bucket: uuid::Uuid,
     pub duration_seconds: i64,
     pub author_id: i32,
 }

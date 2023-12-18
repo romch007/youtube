@@ -3,7 +3,7 @@ create table videos (
   title varchar not null,
   description text not null,
   duration_seconds bigint not null,
-  bucket varchar not null,
+  bucket uuid not null,
   published_at timestamptz not null default now(),
   author_id int not null references users(id)
 )
