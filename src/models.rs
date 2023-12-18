@@ -75,3 +75,14 @@ pub struct VideoWithAuthor {
     pub video: Video,
     pub author: User,
 }
+
+#[derive(Identifiable, Selectable, Queryable, Associations, Debug)]
+#[diesel(belongs_to(User))]
+#[diesel(belongs_to(Video))]
+#[diesel(table_name = likes)]
+#[diesel(primary_key(user_id, video_id))]
+pub struct Like {
+    pub user_id: i32,
+    pub video_id: i32,
+    pub is_liking: bool,
+}

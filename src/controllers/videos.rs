@@ -28,6 +28,13 @@ pub fn router<S>(state: AppState) -> Router<S> {
             )),
         )
         .route("/:id", get(get_video))
+        .route(
+            "/:id/like",
+            post(like_video).route_layer(axum::middleware::from_fn_with_state(
+                state.clone(),
+                auth::middleware,
+            )),
+        )
         .layer(DefaultBodyLimit::disable())
         .with_state(state)
 }
@@ -144,4 +151,60 @@ async fn get_video(
         .map_not_found()?;
 
     Ok(Json(target_video))
+}
+
+#[derive(Debug, Deserialize)]
+struct LikeVideoBody {
+    likes: Option<bool>,
+}
+
+async fn like_video(
+    State(state): State<AppState>,
+    Path(target_video_id): Path<i32>,
+    Extension(logged_user): Extension<models::User>,
+    Json(like_video_query): Json<LikeVideoBody>,
+) -> Result<(), (StatusCode, String)> {
+    use schema::likes::dsl::{is_liking, likes, user_id, video_id};
+
+    let mut conn = state.db_pool.get().await.map_err(errors::internal_error)?;
+
+    if let Some(new_like) = like_video_query.likes {
+        let existing_like = likes
+            .select(models::Like::as_select())
+            .filter(video_id.eq(target_video_id))
+            .filter(user_id.eq(logged_user.id))
+            .first(&mut conn)
+            .await
+            .optional()
+            .map_err(errors::internal_error)?;
+
+        if existing_like.is_none() {
+            diesel::insert_into(likes)
+                .values((
+                    video_id.eq(target_video_id),
+                    user_id.eq(logged_user.id),
+                    is_liking.eq(new_like),
+                ))
+                .execute(&mut conn)
+                .await
+                .map_err(errors::internal_error)?;
+        } else {
+            diesel::update(likes)
+                .filter(video_id.eq(target_video_id))
+                .filter(user_id.eq(logged_user.id))
+                .set(is_liking.eq(new_like))
+                .execute(&mut conn)
+                .await
+                .map_err(errors::internal_error)?;
+        }
+    } else {
+        diesel::delete(likes)
+            .filter(user_id.eq(logged_user.id))
+            .filter(video_id.eq(target_video_id))
+            .execute(&mut conn)
+            .await
+            .map_err(errors::internal_error)?;
+    }
+
+    Ok(())
 }
