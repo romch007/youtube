@@ -7,15 +7,15 @@ RUN cargo install cargo-build-deps
 
 WORKDIR /app
 
-RUN cargo new --bin backend
-WORKDIR /app/backend
+RUN cargo new --bin youtube
+WORKDIR /app/youtube
 
 COPY Cargo.toml ./
 RUN cargo build-deps --release
 
 COPY src ./src
 RUN cargo build --release
-RUN strip target/release/backend
+RUN strip target/release/youtube
 
 FROM debian:stable-slim AS runtime
 
@@ -29,7 +29,7 @@ EXPOSE 8080
 
 WORKDIR /app
 
-COPY --from=builder /app/backend/target/release/backend /app/backend
+COPY --from=builder /app/youtube/target/release/youtube /app/youtube
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["/app/backend"]
+CMD ["/app/youtube"]
