@@ -115,7 +115,7 @@ pub async fn me(
     State(state): State<AppState>,
     Extension(user): Extension<models::User>,
 ) -> Result<Json<models::UserWithVideos>, (StatusCode, String)> {
-    let mut conn = state.db_pool.get().await.unwrap();
+    let mut conn = state.db_pool.get().await.map_err(errors::internal_error)?;
 
     let related_videos = models::Video::belonging_to(&user)
         .select(models::Video::as_select())

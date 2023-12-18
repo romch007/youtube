@@ -62,7 +62,7 @@ async fn list_videos(
         }
     }
 
-    let mut conn = state.db_pool.get().await.unwrap();
+    let mut conn = state.db_pool.get().await.map_err(errors::internal_error)?;
 
     let res = query
         .load::<(models::Video, models::User)>(&mut conn)
@@ -102,7 +102,7 @@ async fn upload(
         .await
         .map_err(errors::internal_error)?;
 
-    let mut conn = state.db_pool.get().await.unwrap();
+    let mut conn = state.db_pool.get().await.map_err(errors::internal_error)?;
 
     let new_video = models::NewVideo {
         title: upload_request.title,
@@ -127,7 +127,7 @@ async fn get_video(
 ) -> Result<Json<models::Video>, (StatusCode, String)> {
     use schema::videos::dsl::videos;
 
-    let mut conn = state.db_pool.get().await.unwrap();
+    let mut conn = state.db_pool.get().await.map_err(errors::internal_error)?;
 
     let target_video = videos
         .select(models::Video::as_select())

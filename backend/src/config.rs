@@ -73,7 +73,7 @@ async fn init_config() -> Config {
         port: env::var("PORT")
             .unwrap_or_else(|_| String::from("3000"))
             .parse::<u16>()
-            .unwrap(),
+            .expect("invalid PORT"),
     };
 
     let database_config = DatabaseConfig {
